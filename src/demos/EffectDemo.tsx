@@ -30,6 +30,7 @@ export default function EffectDemo() {
 function Box({ title, useLayout }: { title: string; useLayout: boolean }) {
   const [value, setValue] = useState(0)
   const renderCount = useRef(0)
+  // eslint-disable-next-line react-hooks/refs -- 演示渲染次数，故意在 render 阶段累加
   renderCount.current++
 
   // 注意：两个 hook 不能条件调用，所以分别写然后内部判断
@@ -37,7 +38,9 @@ function Box({ title, useLayout }: { title: string; useLayout: boolean }) {
     if (!useLayout && value === 0) {
       // 故意 sleep 一下放大闪烁
       const start = performance.now()
+      // eslint-disable-next-line no-empty -- 忙等阻塞，演示用
       while (performance.now() - start < 50) {}
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- 演示 effect 内 setState 引起的级联渲染
       setValue(Math.floor(Math.random() * 1000))
     }
   }, [value, useLayout])
@@ -45,7 +48,9 @@ function Box({ title, useLayout }: { title: string; useLayout: boolean }) {
   useLayoutEffect(() => {
     if (useLayout && value === 0) {
       const start = performance.now()
+      // eslint-disable-next-line no-empty -- 忙等阻塞，演示用
       while (performance.now() - start < 50) {}
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- 演示 effect 内 setState 引起的级联渲染
       setValue(Math.floor(Math.random() * 1000))
     }
   }, [value, useLayout])
@@ -54,7 +59,10 @@ function Box({ title, useLayout }: { title: string; useLayout: boolean }) {
     <div style={{ border: '1px solid #aaa', padding: 12, flex: 1 }}>
       <h3>{title}</h3>
       <p>value = <b style={{ fontSize: 20 }}>{value}</b></p>
-      <p style={{ color: '#888', fontSize: 12 }}>render 次数：{renderCount.current}</p>
+      <p style={{ color: '#888', fontSize: 12 }}>
+        {/* eslint-disable-next-line react-hooks/refs -- 演示用，render 阶段读 ref */}
+        render 次数：{renderCount.current}
+      </p>
       <button onClick={() => setValue(0)}>重置为 0</button>
     </div>
   )
